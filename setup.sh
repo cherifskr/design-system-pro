@@ -41,13 +41,30 @@ step() { echo "${BLUE}▸${RESET} ${BOLD}$1${RESET}"; }
 ok() { echo "  ${GREEN}✓${RESET} $1"; }
 warn() { echo "  ${YELLOW}!${RESET} $1"; }
 
+# Pull the top [x.y.z] entry out of a CHANGELOG.md file. Silent return
+# (empty string) if the file is missing or doesn't match the format.
+get_version() {
+  local file="$1"
+  [ -f "$file" ] || { echo ""; return; }
+  grep -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "$file" | head -1 \
+    | sed -E 's/^## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/'
+}
+
+# Detect an already-installed version BEFORE we clobber it, so the
+# banner can say "upgrading from x.y.z" instead of a silent rewrite.
+PREVIOUS_VERSION="$(get_version "${SKILL_DIR}/CHANGELOG.md")"
+
 echo ""
 echo "${BOLD}design-system-pro — Claude Code skill${RESET}"
 echo "${DIM}by Chérif Sikirou · cherifsikirou.com${RESET}"
 echo ""
 
 # ── 1. Install the skill ──────────────────────────────────────────
-step "Installing skill into ${SKILL_DIR/$HOME/~}"
+if [ -n "${PREVIOUS_VERSION}" ]; then
+  step "Upgrading skill (currently v${PREVIOUS_VERSION})"
+else
+  step "Installing skill into ${SKILL_DIR/$HOME/~}"
+fi
 
 mkdir -p "${HOME}/.claude/skills"
 
@@ -59,15 +76,28 @@ if [ -f "./SKILL.md" ] && [ -d "./commands" ] && [ -d "./references" ]; then
   mkdir -p "${SKILL_DIR}"
   cp -R ./SKILL.md ./commands ./references ./templates ./LICENSE ./README.md "${SKILL_DIR}/" 2>/dev/null || true
   [ -f ./CHANGELOG.md ] && cp ./CHANGELOG.md "${SKILL_DIR}/"
+  [ -d ./docs ] && cp -R ./docs "${SKILL_DIR}/"
+  [ -d ./slash ] && cp -R ./slash "${SKILL_DIR}/"
   ok "Skill files copied from local clone"
 else
   # Clone fresh from GitHub.
   if [ -d "${SKILL_DIR}" ]; then
-    warn "Skill already installed — removing old version"
+    if [ -n "${PREVIOUS_VERSION}" ]; then
+      warn "Removing v${PREVIOUS_VERSION} before upgrade"
+    else
+      warn "Skill already installed — removing old version"
+    fi
     rm -rf "${SKILL_DIR}"
   fi
   git clone --depth 1 "${REPO_URL}" "${SKILL_DIR}" > /dev/null 2>&1
   ok "Skill cloned from GitHub"
+fi
+
+NEW_VERSION="$(get_version "${SKILL_DIR}/CHANGELOG.md")"
+if [ -n "${NEW_VERSION}" ] && [ -n "${PREVIOUS_VERSION}" ] && [ "${NEW_VERSION}" != "${PREVIOUS_VERSION}" ]; then
+  ok "Upgraded v${PREVIOUS_VERSION} → v${NEW_VERSION}"
+elif [ -n "${NEW_VERSION}" ]; then
+  ok "Installed v${NEW_VERSION}"
 fi
 
 # ── 2. Register the /ds slash command ─────────────────────────────

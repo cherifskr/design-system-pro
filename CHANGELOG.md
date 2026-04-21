@@ -5,6 +5,25 @@ All notable changes to this skill are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-04-20
+
+### Added
+
+- **Version-aware `setup.sh`** — the installer now reads the existing
+  `CHANGELOG.md` before clobbering, prints `"Upgrading v0.2.0 → v0.3.1"`
+  when an older install is detected. Clear signal to the user that
+  something *changed*, instead of a silent rewrite.
+- **"Upgrading from a previous version" section in README** — explicit
+  upgrade paths for both `setup.sh` users and people who cloned via
+  `git clone` directly.
+- **`setup.sh` now copies `docs/` and `slash/`** when running from a
+  local clone (missed in v0.3.0 — upgrades from a local clone didn't
+  get the tutorials or the bundled slash command).
+
+### Upgrade from v0.3.0
+
+Run `setup.sh` again. No breaking changes, no config to touch.
+
 ## [0.3.0] — 2026-04-20
 
 ### Added
@@ -38,6 +57,12 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Embedded slash command in `setup.sh`** updated to match the new
   `slash/ds.md` — previously new installs would get the v0.2 layout
   without the `help` command.
+
+### Upgrade from v0.2.x
+
+Run `setup.sh` again — it overwrites both the skill and the `/ds`
+slash command. Your previous `/ds` shortcut will now default to the
+new `/ds help` menu when called without arguments. No config to edit.
 
 ## [0.2.0] — 2026-04-20
 
@@ -82,6 +107,19 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   get the `/ds` shortcut (it only existed on the author's machine).
   Now shipped with the repo and installable via `setup.sh`.
 
+### Upgrade from v0.1.x
+
+The recommended path is to run the new `setup.sh` — it installs both
+the skill and the `/ds` shortcut in one go:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cherifskr/design-system-pro/main/setup.sh | bash
+```
+
+If you prefer manual: `cd ~/.claude/skills/design-system-pro && git pull`
+will update the skill files but won't install `/ds` — copy it by hand
+with `cp slash/ds.md ~/.claude/commands/ds.md` afterward.
+
 ## [0.1.0] — 2026-04-19
 
 ### Initial release
@@ -113,6 +151,7 @@ The first public version. Three commands, three references, three templates.
 React (.tsx, .jsx), Vue, Svelte, Astro, Tailwind CSS v3/v4, CSS-in-JS,
 vanilla CSS / SCSS.
 
+[0.3.1]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.1
 [0.3.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.0
 [0.2.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.2.0
 [0.1.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.1.0

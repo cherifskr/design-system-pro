@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-ff6b35.svg)](https://docs.claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.1-blue.svg)](./CHANGELOG.md)
 
 ---
 
@@ -90,6 +90,34 @@ Either way works the same:
 | 2. | Natural language | « audite mon design system », « review mes composants » |
 
 Claude Code auto-triggers the skill on keyword match in either case.
+
+## Upgrading from a previous version
+
+### If you installed via `setup.sh` (recommended)
+
+Just re-run the same command — `setup.sh` is safe to re-run and detects existing installs:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cherifskr/design-system-pro/main/setup.sh | bash
+```
+
+You'll see a message like `Upgrading v0.2.0 → v0.3.1` confirming what changed. Both the skill **and** the `/ds` slash command get refreshed in one shot.
+
+### If you cloned with `git clone` directly
+
+Update the skill files with `git pull`, then **manually re-copy the slash command** (this is the part `git pull` doesn't touch):
+
+```bash
+cd ~/.claude/skills/design-system-pro
+git pull
+cp slash/ds.md ~/.claude/commands/ds.md
+```
+
+### After any upgrade
+
+**Restart Claude Code** so it picks up the new skill description, new commands, and updated slash command definition. Otherwise the old cache is still active and you won't see the new features.
+
+> **No breaking changes between minor versions** — every v0.x.y → v0.x.z upgrade is safe. Check the [CHANGELOG](./CHANGELOG.md) for what's new.
 
 ## Structure
 
