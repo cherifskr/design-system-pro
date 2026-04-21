@@ -84,8 +84,8 @@ fi
 # quote 'EOF' so Bash doesn't interpolate anything.
 cat > "${CMD_FILE}" <<'EOF'
 ---
-description: Invoke the design-system-pro skill — audit, document, extend, or extract tokens from a design system.
-argument-hint: "[audit | document <component> | extend <pattern> | tokens]"
+description: Invoke the design-system-pro skill — audit, document, extend, or extract tokens from a design system. Type /ds help for the full menu.
+argument-hint: "[help | audit | document <component> | extend <pattern> | tokens]"
 ---
 
 Charge et exécute le skill **design-system-pro** installé dans `~/.claude/skills/design-system-pro/`.
@@ -95,15 +95,15 @@ Instructions :
 1. Lis d'abord `~/.claude/skills/design-system-pro/SKILL.md` pour charger le contexte du skill et ses principes de travail.
 
 2. Interprète le premier mot de `$ARGUMENTS` comme commande :
+   - `help` **ou sans argument** → lis `~/.claude/skills/design-system-pro/commands/help.md` et affiche le menu d'aide formaté
    - `audit` → lis `~/.claude/skills/design-system-pro/commands/audit.md` et applique la procédure d'audit sur le projet courant
    - `document <component>` → lis `~/.claude/skills/design-system-pro/commands/document.md` et produis la documentation du composant demandé
    - `extend <pattern>` → lis `~/.claude/skills/design-system-pro/commands/extend.md` et propose un nouveau composant raisonné
    - `tokens` → lis `~/.claude/skills/design-system-pro/commands/tokens.md` et extrais les tokens utilisés sous forme de JSON W3C DTCG
-   - **Sans argument** → demande à l'utilisateur laquelle des 4 commandes il veut lancer
 
-3. Si la procédure référence les guides (`references/*.md`) ou les templates (`templates/*.md`), **lis-les à la demande** — ne charge pas tout d'un coup.
+3. Si la procédure référence les guides (`references/*.md`), les templates (`templates/*.md`) ou les tutoriels (`docs/*.md`), **lis-les à la demande** — ne charge pas tout d'un coup.
 
-4. Respecte les 6 principes de travail définis dans SKILL.md.
+4. Respecte les 7 principes de travail définis dans SKILL.md.
 
 Argument passé par l'utilisateur : `$ARGUMENTS`
 EOF
@@ -114,17 +114,46 @@ ok "/ds command registered at ${CMD_FILE/$HOME/~}"
 echo ""
 echo "${GREEN}${BOLD}✓ Installation complete${RESET}"
 echo ""
-echo "${BOLD}Next steps:${RESET}"
-echo "  1. ${DIM}Restart Claude Code${RESET} so it picks up the new skill and command."
-echo "  2. Try it in any project:"
+echo "${BOLD}─── Next step — restart Claude Code ────────────────────────${RESET}"
 echo ""
-echo "     ${BOLD}/ds audit${RESET}        ${DIM}# scan the design system${RESET}"
-echo "     ${BOLD}/ds document Button${RESET}"
-echo "     ${BOLD}/ds extend confirmation-dialog${RESET}"
-echo "     ${BOLD}/ds tokens${RESET}       ${DIM}# extract tokens as W3C DTCG JSON${RESET}"
+echo "  Close and reopen Claude Code so it picks up the new skill"
+echo "  and the ${BOLD}/ds${RESET} command."
 echo ""
-echo "  Or just describe what you want — the skill auto-triggers on"
-echo "  phrases like «audite mon design system» or «review mes composants»."
+echo "${BOLD}─── Start with one command ─────────────────────────────────${RESET}"
 echo ""
-echo "${DIM}Questions, feedback, bugs → contact@cherifsikirou.com${RESET}"
+echo "  ${GREEN}${BOLD}/ds help${RESET}   ${DIM}# shows the full menu with examples${RESET}"
+echo ""
+echo "  Or jump straight to:"
+echo ""
+echo "  ${BOLD}/ds audit${RESET}                          ${DIM}# scan your whole DS${RESET}"
+echo "    └─ Detects your stack, finds hardcoded tokens,"
+echo "       WCAG AA gaps, orphan variants, naming drift."
+echo "       Scores /100 + prioritized 🔴 🟡 🟢 action plan."
+echo ""
+echo "  ${BOLD}/ds document Button${RESET}                ${DIM}# generate full component doc${RESET}"
+echo "    └─ Extracts API, variants, states, a11y. Outputs"
+echo "       markdown ready for Notion/Storybook/your team Slack."
+echo ""
+echo "  ${BOLD}/ds extend confirmation-dialog${RESET}     ${DIM}# reasoned new component spec${RESET}"
+echo "    └─ Proposes 2-3 options with tradeoffs before you"
+echo "       write a single line of code. You validate the direction."
+echo ""
+echo "  ${BOLD}/ds tokens${RESET}                         ${DIM}# extract used tokens → tokens.json${RESET}"
+echo "    └─ Scans your code + CSS and outputs a valid W3C DTCG"
+echo "       tokens.json you can import in Figma Tokens Studio."
+echo ""
+echo "${BOLD}─── Tip — natural language works too ───────────────────────${RESET}"
+echo ""
+echo "  The skill auto-triggers on phrases like:"
+echo "  ${DIM}• \"audite mon design system\"${RESET}"
+echo "  ${DIM}• \"review mes composants\"${RESET}"
+echo "  ${DIM}• \"extrais mes tokens\"${RESET}"
+echo ""
+echo "${BOLD}─── Learn more ─────────────────────────────────────────────${RESET}"
+echo ""
+echo "  ${BLUE}▸${RESET} Step-by-step tutorials in ${BOLD}~/.claude/skills/design-system-pro/docs/${RESET}"
+echo "  ${BLUE}▸${RESET} Full README:     ${DIM}https://github.com/cherifskr/design-system-pro${RESET}"
+echo "  ${BLUE}▸${RESET} Questions / feedback: ${DIM}contact@cherifsikirou.com${RESET}"
+echo ""
+echo "${DIM}Happy auditing —  Chérif${RESET}"
 echo ""

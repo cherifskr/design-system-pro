@@ -1,13 +1,13 @@
 ---
 name: design-system-pro
-description: Audite, documente, étend et exporte un design system comme un senior product designer. Détecte ta stack (Next, Tailwind, shadcn, Radix, cva), scanne les tokens hardcodés, les variants orphelins, les écarts WCAG AA, et produit de la doc prête à partager. Invoque-le via « audite mon design system » ou via le raccourci /ds (audit, document, extend, tokens).
+description: Audite, documente, étend et exporte un design system comme un senior product designer. Détecte ta stack (Next, Tailwind, shadcn, Radix, cva), scanne les tokens hardcodés, les variants orphelins, les écarts WCAG AA, et produit de la doc prête à partager. Invoque-le via « audite mon design system » ou via le raccourci /ds (help, audit, document, extend, tokens). Première fois ? Lance /ds help.
 ---
 
 # Design System Pro
 
 Ce skill transforme Claude en **partenaire senior sur ton design system**. Il scanne ton code (React, Next, Vue, Svelte, Tailwind v3/v4, shadcn, CSS-in-JS), repère les incohérences qu'un humain mettrait une journée à trouver, et produit des livrables partageables avec ton équipe.
 
-Quatre commandes, un seul principe : **consistance > créativité**.
+Cinq commandes, un seul principe : **consistance > créativité**.
 
 ## Comment l'invoquer
 
@@ -15,6 +15,7 @@ Deux façons équivalentes :
 
 1. **Raccourci slash command** (si l'alias `/ds` est installé — voir README) :
    ```
+   /ds help                        # menu d'aide — utile la première fois
    /ds audit
    /ds document Button
    /ds extend confirmation-dialog
@@ -31,7 +32,14 @@ Deux façons équivalentes :
 
 Claude détecte le skill automatiquement sur les mots-clés de cette description. Le raccourci `/ds` est juste un alias court pour ceux qui l'installent.
 
-## Les 4 commandes
+**Première fois ?** Lance `/ds help` pour voir le menu complet avec exemples, ou lis directement les tutoriels dans [docs/](docs/).
+
+## Les 5 commandes
+
+### `/ds help` — menu d'aide formaté *(nouveau v0.3)*
+Premier geste quand tu découvres le skill. Affiche le menu complet avec les 4 autres commandes, leurs exemples, la durée moyenne de chaque, et des liens vers les tutoriels étape-par-étape dans `docs/`.
+
+→ Voir [commands/help.md](commands/help.md)
 
 ### `/ds audit` — diagnostic complet, stack-aware
 Détecte ta stack (framework + UI libs + tokens) puis applique les checks pertinents :
@@ -91,6 +99,15 @@ Le skill s'appuie sur 4 documents de référence — charge-les quand tu en as b
 - [templates/audit-report.md](templates/audit-report.md) — structure du rapport d'audit
 - [templates/component-doc.md](templates/component-doc.md) — format de doc composant
 - [templates/tokens.json](templates/tokens.json) — exemple tokens W3C valides
+
+## Tutoriels pas-à-pas *(nouveau v0.3)*
+
+Pour les utilisateurs qui veulent apprendre en faisant :
+
+- [docs/first-audit.md](docs/first-audit.md) — Ton premier `/ds audit`, de zéro au plan d'action
+- [docs/document-component.md](docs/document-component.md) — Générer une vraie doc pour un Button
+- [docs/extend-pattern.md](docs/extend-pattern.md) — Raisonner un nouveau composant avant de coder
+- [docs/extract-tokens.md](docs/extract-tokens.md) — Bootstrap un `tokens.json` depuis du legacy
 
 ## Principes de travail
 

@@ -5,6 +5,40 @@ All notable changes to this skill are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-04-20
+
+### Added
+
+- **New command `/ds help`** — formatted help menu shown on `/ds help`
+  or a bare `/ds` without arguments. Explains each command with a
+  real example, its typical duration, and when to reach for it. The
+  first command new users should run.
+- **`docs/` folder with 4 step-by-step tutorials** — each covers one
+  command end-to-end (scenario, output, how to interpret, pitfalls):
+  - `docs/first-audit.md`
+  - `docs/document-component.md`
+  - `docs/extend-pattern.md`
+  - `docs/extract-tokens.md`
+- **Enriched `setup.sh` post-install message** — explains what each
+  command does in one line, suggests a first step (`/ds help`),
+  and links to the tutorials folder.
+- **README "Example outputs" section** — each command now ships with
+  a collapsible example showing what a real run produces (audit
+  report, component doc, extend proposal, tokens.json).
+
+### Changed
+
+- **Bare `/ds` now shows the help menu** instead of asking the user
+  which command to run. Lower friction for first-timers.
+- **SKILL.md description** references `/ds help` so Claude proactively
+  suggests it when a new user invokes the skill.
+
+### Fixed
+
+- **Embedded slash command in `setup.sh`** updated to match the new
+  `slash/ds.md` — previously new installs would get the v0.2 layout
+  without the `help` command.
+
 ## [0.2.0] — 2026-04-20
 
 ### Added
@@ -79,5 +113,6 @@ The first public version. Three commands, three references, three templates.
 React (.tsx, .jsx), Vue, Svelte, Astro, Tailwind CSS v3/v4, CSS-in-JS,
 vanilla CSS / SCSS.
 
+[0.3.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.0
 [0.2.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.2.0
 [0.1.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.1.0
