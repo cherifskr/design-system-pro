@@ -1,73 +1,82 @@
-# Design System Pro — Claude Code Skill
+# Design System Pro
 
-> Audit, document, extend and export your design system like a senior product designer — straight from Claude Code.
+### The DS audit you've been putting off for 18 months — done in 2 minutes.
+
+Four commands that turn Claude into a senior product designer reviewing your codebase: scan for hardcoded tokens, orphan variants, WCAG AA gaps and naming drift. Document the components that work. Reason the ones that are missing. Export everything as W3C DTCG tokens.
+
+Stack-aware for **React · Next · Vue · Svelte · Tailwind v3/v4 · shadcn · Radix · cva**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-ff6b35.svg)](https://docs.claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-0.3.1-blue.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.2-blue.svg)](./CHANGELOG.md)
 
 ---
 
-## What it does
+## Before → With `/ds`
 
-Four commands that turn Claude into a **senior DS partner** on your project:
+| Task                          | Without | With `/ds` |
+|-------------------------------|---------|------------|
+| Full DS audit                 | 1–2 days | **2–5 min** |
+| Document a component          | 30 min   | **1–2 min** |
+| Reason a new pattern          | 1 hour   | **2–3 min** |
+| Extract tokens from code      | 4 hours  | **3–5 min** |
 
-```bash
-/ds audit                       # scan your DS — stack-aware, tokens, a11y, naming drift
-/ds document Button             # generate a full component doc
-/ds extend confirmation-dialog  # propose a reasoned new component
-/ds tokens                      # extract used tokens as W3C DTCG JSON
-```
+No config. No dependencies beyond Claude Code itself. Opinionated output grounded in Nielsen, W3C DTCG, and 8+ years of real DS production.
 
-Works on **React / Next / Vue / Svelte** with **Tailwind v3/v4 / CSS-in-JS / shadcn / Radix**. Zero config.
+---
 
-## Why this exists
-
-Every designer I know has a Notion page called « DS audit » they never open. Every engineering team has a `components/ui/` folder that drifts three times a year. The problem isn't the will — it's the **time to look at it seriously**.
-
-This skill does the looking. In 2 minutes instead of 2 days.
-
-- **`/ds audit`** detects your stack (Next/Tailwind/shadcn/Radix/cva) and applies relevant checks: hardcoded tokens, orphan components, WCAG AA gaps, naming drift, god-mode components, unused cva variants. Scores it /100 with a 3-band priority list.
-- **`/ds document <component>`** extracts API, variants, states, a11y from the file and produces markdown doc ready for Storybook, Notion, or your team Slack.
-- **`/ds extend <pattern>`** proposes a new component **before** you write it: 2-3 options with tradeoffs, API contract, tokens consumed, a11y considerations.
-- **`/ds tokens`** scans your code + CSS and extracts every color, spacing, radius, typography value actually used — outputs a valid W3C DTCG `tokens.json` you can import into Figma Tokens Studio, Style Dictionary or Terrazzo.
-
-Opinionated output. French prose, English for technical terms (token, variant, WCAG, ARIA — the industry words).
-
-## Quick start
-
-### Option 1 — One-line install (recommended)
-
-Installs the skill **and** registers the `/ds` slash command shortcut in one command:
+## Install in 10 seconds
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cherifskr/design-system-pro/main/setup.sh | bash
 ```
 
-Then restart Claude Code.
+Restart Claude Code, then run:
 
-### Option 2 — Manual install
+```
+/ds help
+```
 
-Skill only (no `/ds` shortcut — you'll invoke by natural language):
+That's it. The installer sets up both the skill and the `/ds` shortcut.
+
+---
+
+## Why this exists
+
+Every designer I know has a Notion page called « DS audit » they never open. Every engineering team has a `components/ui/` folder that drifts three times a year. **The problem isn't the will — it's the time to look at it seriously.**
+
+This skill does the looking. The four commands:
+
+- **`/ds audit`** detects your stack (Next/Tailwind/shadcn/Radix/cva) and applies relevant checks: hardcoded tokens, orphan components, WCAG AA gaps, naming drift, god-mode components, unused cva variants. Scores it /100 with a 3-band priority list.
+- **`/ds document <component>`** extracts API, variants, states, a11y from the file and produces markdown doc ready for Storybook, Notion, or your team Slack.
+- **`/ds extend <pattern>`** proposes a new component **before** you write it: 2–3 options with tradeoffs, API contract, tokens consumed, a11y considerations.
+- **`/ds tokens`** scans your code + CSS and extracts every color, spacing, radius, typography value actually used — outputs a valid W3C DTCG `tokens.json` you can import into Figma Tokens Studio, Style Dictionary or Terrazzo.
+
+French prose, English for technical terms (token, variant, WCAG, ARIA — the industry words). Every flagged issue comes with its rule reference and a proposed fix, not just a complaint.
+
+---
+
+## Other install methods
+
+The curl one-liner above is the recommended path. Two alternatives if you prefer manual control:
+
+### Manual (skill only, no `/ds` shortcut)
 
 ```bash
 git clone https://github.com/cherifskr/design-system-pro ~/.claude/skills/design-system-pro
 ```
 
-If you want the `/ds` shortcut too:
+If you want the `/ds` shortcut too, copy it manually:
 
 ```bash
-# Also register the slash command globally
 mkdir -p ~/.claude/commands
 cp ~/.claude/skills/design-system-pro/slash/ds.md ~/.claude/commands/ds.md
 ```
 
-### Option 3 — Per-project install
-
-Skill committed into a specific repo so your team shares it via Git:
+### Per-project (committed in your repo, team-shared)
 
 ```bash
-# Inside your project root
+# From your project root
 git clone https://github.com/cherifskr/design-system-pro .claude/skills/design-system-pro
 git add .claude/skills/design-system-pro
 git commit -m "chore(skills): add design-system-pro"

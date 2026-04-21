@@ -5,6 +5,23 @@ All notable changes to this skill are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] — 2026-04-21
+
+### Changed
+
+- **README — punchier opening.** The `Why this exists` hook is promoted
+  to the top, a `Before → With /ds` comparison table makes the ROI
+  visible at a glance, and the install command appears in the first
+  screenful. No features changed — pure documentation polish.
+- **Install options restructured.** The curl one-liner is now front
+  and center; manual and per-project alternatives moved to an
+  `Other install methods` section for power users.
+
+### Upgrade from v0.3.1
+
+Pure README / documentation patch. Re-run `setup.sh` if you want the
+bumped version badge; skip otherwise — nothing functional changed.
+
 ## [0.3.1] — 2026-04-20
 
 ### Added
@@ -151,6 +168,7 @@ The first public version. Three commands, three references, three templates.
 React (.tsx, .jsx), Vue, Svelte, Astro, Tailwind CSS v3/v4, CSS-in-JS,
 vanilla CSS / SCSS.
 
+[0.3.2]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.2
 [0.3.1]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.1
 [0.3.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.0
 [0.2.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.2.0
