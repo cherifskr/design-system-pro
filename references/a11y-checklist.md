@@ -15,6 +15,41 @@
 
 **Outils** : WebAIM Contrast Checker, extension axe DevTools, `colorjs.io`.
 
+#### Formule WCAG (à appliquer dans `/ds audit` quand possible)
+
+Le contraste entre 2 couleurs se calcule via leur **luminance relative**.
+
+**Étape 1 — Luminance relative de chaque couleur** :
+
+```
+Pour une couleur RGB avec r, g, b en [0, 1] :
+
+  R = r ≤ 0.03928 ? r / 12.92 : ((r + 0.055) / 1.055) ^ 2.4
+  G = g ≤ 0.03928 ? g / 12.92 : ((g + 0.055) / 1.055) ^ 2.4
+  B = b ≤ 0.03928 ? b / 12.92 : ((b + 0.055) / 1.055) ^ 2.4
+
+  L = 0.2126 × R + 0.7152 × G + 0.0722 × B
+```
+
+**Étape 2 — Ratio de contraste** :
+
+```
+  ratio = (L_clair + 0.05) / (L_sombre + 0.05)
+```
+
+Où `L_clair` est la luminance de la couleur la plus claire et `L_sombre` celle de la plus sombre. Le ratio est toujours ≥ 1.
+
+**Exemples** :
+- `#1A1A1A` sur `#FFFFFF` → ratio ≈ **15.7:1** ✅ AAA
+- `#737373` sur `#FFFFFF` → ratio ≈ **4.54:1** ✅ AA pile-poil
+- `#A3A3A3` sur `#FFFFFF` → ratio ≈ **2.86:1** ❌ échec AA
+- `#F59E0B` sur `#FFFFFF` → ratio ≈ **2.3:1** ❌ pas suffisant pour du texte
+
+**Quand l'appliquer dans l'audit** :
+Dans un scan `/ds audit`, quand tu détectes dans un même fichier/bloc un `color:` et un `background-color:` (ou leur équivalent Tailwind : `text-*` + `bg-*` sur un même composant), résous les hex (via les tokens déclarés si possible), applique la formule, et flag si le ratio est < 4.5 pour du texte normal.
+
+Ne pas inventer de valeur si une des couleurs est dynamique (`var(--x)` non résolue, accent couleur passée en prop) — dans ce cas flag en 🟡 "à vérifier manuellement".
+
 ### 2. Focus visible (WCAG 2.4.7)
 
 - Chaque élément focusable **doit** montrer un indicateur de focus clair
