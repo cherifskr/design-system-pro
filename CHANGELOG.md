@@ -5,6 +5,65 @@ All notable changes to this skill are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-04-23
+
+### Added
+
+- **New command `/ds diff <before> <after>`.** Compares two `DESIGN.md`
+  files (or two audit JSON reports) and surfaces tokens added/removed/
+  modified, breaking changes with the list of consumer files, and
+  resolved/new/persistent findings. Verdict in one line —
+  ✅ Compatible / ⚠️ Visual change / 🔴 Breaking — followed by the
+  detail and a machine-readable JSON block aligned with
+  [`@google/design.md diff`](https://github.com/google-labs-code/design.md).
+  Closes the "did my PR break the DS?" gap.
+- **New command `/ds rules`.** Exports the 12 named lint rules
+  (`a11y-contrast`, `hardcoded-color`, …) used by `/ds audit` as
+  markdown or JSON. Drop-in for another agent's system prompt
+  (Cursor, Copilot, Codex), commitable as `DS-RULES.md` or
+  `.cursor/rules/ds.md`. Filterable by `--severity` or `--rule`.
+- **`DESIGN.md` as a first-class output of `/ds audit`.** Each audit
+  now produces a `DESIGN.md` at the root of the scanned scope, on top
+  of the markdown report. The format is compatible with
+  [`@google/design.md`](https://github.com/google-labs-code/design.md):
+  YAML front matter for tokens (colors, typography, spacing, rounded,
+  components) + canonical markdown sections for prose. It's the
+  single artefact a downstream agent (Claude, Cursor, Copilot) needs
+  to respect the design system without re-scanning the codebase. New
+  template: `templates/design.md`.
+- **9 named lint rules.** Each finding produced by `/ds audit` now
+  carries a `rule` name with a fixed default severity:
+  `hardcoded-color`, `hardcoded-spacing`, `hardcoded-typography`,
+  `orphan-variant`, `orphan-export`, `god-component`,
+  `duplicated-component`, `naming-drift`, `a11y-contrast`,
+  `a11y-label-missing`, `a11y-focus-removed`, `a11y-semantic`.
+  Severity overrides require an explicit `reason` — judgment becomes
+  auditable instead of implicit.
+- **Structured findings JSON block** appended to every audit report
+  (`{ rule, severity, path, message, reason? }`). Machine-readable,
+  diff-able across runs, exportable to a tracker.
+- **Per-rule summary table** at the top of the report — counts of
+  errors / warnings / info per rule, lets the reader spot patterns
+  before reading the detail.
+
+### Changed
+
+- **Audit report sections now follow the canonical order** inspired
+  by the DESIGN.md spec: `Overview → Colors → Typography → Layout →
+  Elevation & Depth → Shapes → Components → Do's and Don'ts`. Reports
+  become comparable across projects, and the markdown body of the
+  generated `DESIGN.md` follows the same order.
+- **Three-band priority is now derived from severity**, not the other
+  way around. 🔴 = `error`, 🟡 = `warning`, 🟢 = `info`. No more
+  contextual band assignment that drifts run-to-run.
+
+### Upgrade from v0.3.x
+
+Run `setup.sh` again. No breaking change in invocation — `/ds audit`
+still works the same. The new `DESIGN.md` artefact is generated
+automatically; the markdown report gains a per-rule summary table and
+a JSON findings block at the bottom.
+
 ## [0.3.2] — 2026-04-21
 
 ### Changed
@@ -168,6 +227,7 @@ The first public version. Three commands, three references, three templates.
 React (.tsx, .jsx), Vue, Svelte, Astro, Tailwind CSS v3/v4, CSS-in-JS,
 vanilla CSS / SCSS.
 
+[0.4.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.4.0
 [0.3.2]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.2
 [0.3.1]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.1
 [0.3.0]: https://github.com/cherifskr/design-system-pro/releases/tag/v0.3.0

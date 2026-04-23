@@ -2,6 +2,7 @@
 
 > Scan effectué le {{date}} par `/ds audit`
 > Scope : `{{scope-path}}` · {{files-count}} fichiers analysés
+> Stack détectée : {{stack-summary}}
 
 ## Score global : {{score}} / 100
 
@@ -21,16 +22,32 @@
 | Orphelins | {{orphans-status}} | {{orphans-score}} / 10 |
 | Duplication | {{dup-status}} | {{dup-score}} / 10 |
 
+### Résumé par règle
+
+| Rule | Errors | Warnings | Info |
+|---|---|---|---|
+| `a11y-contrast` | {{n}} | — | — |
+| `a11y-label-missing` | {{n}} | — | — |
+| `a11y-focus-removed` | {{n}} | — | — |
+| `a11y-semantic` | — | {{n}} | — |
+| `hardcoded-color` | — | {{n}} | — |
+| `hardcoded-spacing` | — | {{n}} | — |
+| `hardcoded-typography` | — | {{n}} | — |
+| `orphan-variant` | — | {{n}} | — |
+| `god-component` | — | {{n}} | — |
+| `duplicated-component` | — | {{n}} | — |
+| `naming-drift` | — | — | {{n}} |
+| `orphan-export` | — | — | {{n}} |
+
 ---
 
 ## 🔴 Bloquant — {{blocking-count}} item(s)
 
-*À traiter cette semaine. Impact utilisateur direct ou risque de régression.*
+*Sévérité `error` — à traiter cette semaine. Impact utilisateur direct ou risque de régression.*
 
-### 🔴 1. {{title}}
+### 🔴 1. `{{rule-name}}` · {{title}}
 
-**Fichiers concernés** :
-- `{{file-path}}:{{line}}` — {{context}}
+**Path** : `{{file-path}}:{{line}}` — {{context}}
 
 **Problème** : {{what-is-wrong}}
 
@@ -49,16 +66,16 @@
 
 ## 🟡 Dette — {{debt-count}} item(s)
 
-*À planifier ce mois-ci. Incohérences, duplication, maintenance qui s'accumule.*
+*Sévérité `warning` — à planifier ce mois-ci. Incohérences, duplication, maintenance qui s'accumule.*
 
-### 🟡 1. {{title}}
+### 🟡 1. `{{rule-name}}` · {{title}}
 
-**Occurrences** : {{count}} hardcodes sur {{scope-count}} fichiers
+**Occurrences** : {{count}} sur {{scope-count}} fichiers
 
 **Détail** :
-| Fichier | Ligne | Valeur actuelle | Token suggéré |
-|---|---|---|---|
-| `{{file}}` | {{line}} | `{{value}}` | `{{token-name}}` |
+| Path | Valeur actuelle | Token suggéré |
+|---|---|---|
+| `{{file}}:{{line}}` | `{{value}}` | `{{token-name}}` |
 
 **Recommandation** : {{what-to-do}}
 
@@ -68,9 +85,9 @@
 
 ## 🟢 Nice-to-have — {{nice-count}} item(s)
 
-*Polish. À traiter quand tu as de la marge.*
+*Sévérité `info` — polish. À traiter quand tu as de la marge.*
 
-### 🟢 1. {{title}}
+### 🟢 1. `{{rule-name}}` · {{title}}
 
 {{short-description}}
 
@@ -87,6 +104,54 @@ Les 3 items qui donnent le **maximum de valeur** pour le minimum d'effort :
 3. **{{item-3-title}}** ({{item-3-effort}}) — {{item-3-why}}
 
 Total : **{{total-effort-this-week}}** pour passer de {{current-score}} à environ **{{projected-score}} / 100**.
+
+---
+
+## 📦 Livrables générés
+
+En plus de ce rapport, `/ds audit` a produit :
+
+- **`DESIGN.md`** à la racine du scope — la carte d'identité du DS, lisible
+  par tout agent (Claude, Cursor, Copilot). Format compatible
+  [`@google/design.md`](https://github.com/google-labs-code/design.md).
+  Valider avec : `npx @google/design.md lint DESIGN.md`
+- **`tokens.json`** *(si `/ds tokens` a été chaîné)* — format W3C DTCG,
+  importable dans Figma Tokens Studio, Style Dictionary, Terrazzo.
+
+---
+
+## 🔬 Findings bruts (JSON)
+
+> Structure machine-readable des findings de cet audit. Utile pour un
+> futur `/ds diff`, ou pour exporter vers un tracker (Linear, Jira).
+
+```json
+{
+  "version": "0.4",
+  "scope": "{{scope-path}}",
+  "scannedAt": "{{iso-date}}",
+  "stack": {
+    "framework": "{{framework}}",
+    "uiLibs": ["{{lib}}"],
+    "tokensConfig": "{{path}}"
+  },
+  "summary": {
+    "errors": {{errors-count}},
+    "warnings": {{warnings-count}},
+    "info": {{info-count}}
+  },
+  "score": {{score}},
+  "findings": [
+    {
+      "rule": "{{rule-name}}",
+      "severity": "error" | "warning" | "info",
+      "path": "{{file-path}}:{{line}}",
+      "message": "{{one-line factual description}}",
+      "reason": "{{optional — only when default severity was overridden}}"
+    }
+  ]
+}
+```
 
 ---
 
@@ -115,4 +180,4 @@ Certaines dimensions nécessitent une revue humaine. Elles sont listées mais no
 
 ---
 
-*Rapport généré par [Design System Pro](https://cherifsikirou.com) · skill Claude Code*
+*Rapport généré par [Design System Pro](https://cherifsikirou.com) v0.4 · skill Claude Code*

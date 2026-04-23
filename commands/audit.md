@@ -85,7 +85,50 @@ Pour chaque zone, utilise Grep/Glob ciblés (pas de lecture exhaustive inutile) 
 - Présence de JSDoc sur les exports principaux → bonus
 - Absence totale de commentaires sur composants complexes (> 200 lignes) → malus
 
-### 3. Score sur 100
+### 3. Format des findings (règles nommées)
+
+Chaque problème détecté est un **finding structuré** — pas une opinion en
+prose libre. Cela rend le rapport machine-readable, comparable d'un audit
+à l'autre, et compatible avec un futur `/ds diff`.
+
+**Format obligatoire de chaque finding** (interne — utilisé pour générer
+le rapport markdown final) :
+
+```json
+{
+  "rule": "<rule-name>",
+  "severity": "error" | "warning" | "info",
+  "path": "<file>:<line>" | "<token-path>" | "<component-name>",
+  "message": "<one-line factual description>"
+}
+```
+
+**Les 9 règles canoniques** (sévérité **par défaut** — peut être ajustée
+en contexte, mais l'ajustement doit être motivé dans le finding) :
+
+| Rule | Severity | What it checks |
+|:--|:--|:--|
+| `hardcoded-color` | warning | Couleur hex/rgb hors fichiers de tokens, hors fallbacks légitimes |
+| `hardcoded-spacing` | warning | Pixel value qui ne matche pas l'échelle (4/8/12/16/24/32/48…) |
+| `hardcoded-typography` | warning | `font-family` ou `font-size` en dur hors config |
+| `orphan-variant` | warning | Variant `cva`/`tv` défini mais jamais consommé |
+| `orphan-export` | info | Composant exporté mais jamais importé ailleurs |
+| `god-component` | warning | 15+ props, ou 5+ booléens (signal de découpage) |
+| `duplicated-component` | warning | Composants quasi-identiques (Card vs Tile vs Panel) |
+| `naming-drift` | info | Mix kebab-case / PascalCase / abréviations dans une même zone |
+| `a11y-contrast` | error | Ratio < 4.5:1 calculé entre `color` + `background-color` |
+| `a11y-label-missing` | error | Icon-only button, input ou interactive sans label accessible |
+| `a11y-focus-removed` | error | `outline: none` non compensé par un focus ring visible |
+| `a11y-semantic` | warning | Élément interactif avec `<div>`/`<span>` au lieu de `<button>`/`<a>` |
+
+**Règle de remontée/descente de sévérité** :
+- Si tu ajustes la sévérité par défaut (ex : un hardcode dans un export
+  PDF passe de `warning` à `info`), **ajoute un champ `reason`** au
+  finding qui explique pourquoi.
+- N'invente pas de règle hors de cette liste sans la justifier
+  explicitement (`rule: "custom-<name>"`).
+
+### 4. Score sur 100 (dérivé des findings)
 
 Applique cette grille :
 
@@ -100,22 +143,54 @@ Applique cette grille :
 
 Plancher à 0, plafond à 100.
 
-### 4. Production du rapport
+### 5. Production du rapport markdown
 
 Utilise le template [templates/audit-report.md](../templates/audit-report.md).
 
 Structure en 3 bandes **obligatoires** :
 
-- 🔴 **Bloquant** — a11y, sécurité, casses utilisateur réelles
-- 🟡 **Dette** — incohérences, duplication, maintenance qui s'accumule
-- 🟢 **Nice-to-have** — polish, conventions qui pourraient être plus strictes
+- 🔴 **Bloquant** — `severity: error` (a11y, sécurité, casses utilisateur réelles)
+- 🟡 **Dette** — `severity: warning` (incohérences, duplication, maintenance qui s'accumule)
+- 🟢 **Nice-to-have** — `severity: info` (polish, conventions qui pourraient être plus strictes)
+
+Le mapping bande ↔ sévérité doit être **strict** : la bande est dérivée
+de la sévérité du finding, pas l'inverse.
 
 Pour chaque item :
+- Le **nom de la règle** (ex : `hardcoded-color`) en badge
 - Le problème (1 phrase)
-- Les fichiers/lignes concernés
+- Les fichiers/lignes concernés (`path` du finding)
 - Pourquoi c'est un problème (impact concret)
 - La correction proposée (extrait de code avant/après si possible)
 - L'effort estimé (XS = 15min, S = 1h, M = demi-journée, L = journée, XL = plusieurs jours)
+
+### 6. Livrable secondaire — `DESIGN.md`
+
+En plus du rapport, **produis systématiquement** un `DESIGN.md` à la
+racine du scope analysé. C'est la **carte d'identité** du DS, lisible par
+humain ET par tout agent (Claude, Cursor, Copilot…) qui touchera ensuite
+le code. C'est le seul artefact dont un nouvel agent a besoin pour
+respecter le DS sans relire tout le code.
+
+Format : voir [templates/design.md](../templates/design.md) (compatible
+[`@google/design.md`](https://github.com/google-labs-code/design.md)).
+
+**Règles de génération** :
+
+1. **Tokens** dans le YAML front matter (colors, typography, spacing,
+   rounded, components) → extraits du **vrai code**, pas inventés.
+2. **Sections markdown** dans **l'ordre canonique** :
+   `Overview → Colors → Typography → Layout → Elevation & Depth →
+   Shapes → Components → Do's and Don'ts`. Ordre obligatoire,
+   sections vides à omettre.
+3. **Pas de section dupliquée** (deux `## Colors` = fichier invalide).
+4. **Références de tokens** entre accolades : `{colors.primary}`,
+   `{rounded.md}`. Toute référence doit résoudre vers un token défini
+   dans le YAML.
+5. Si l'utilisateur a déjà un `DESIGN.md`, **fais un diff conceptuel**
+   et propose les évolutions plutôt que d'écraser.
+6. Termine en suggérant à l'utilisateur de valider :
+   `npx @google/design.md lint DESIGN.md`
 
 ## Règles d'output
 

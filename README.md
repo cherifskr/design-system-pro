@@ -2,13 +2,13 @@
 
 ### The DS audit you've been putting off for 18 months — done in 2 minutes.
 
-Four commands that turn Claude into a senior product designer reviewing your codebase: scan for hardcoded tokens, orphan variants, WCAG AA gaps and naming drift. Document the components that work. Reason the ones that are missing. Export everything as W3C DTCG tokens.
+Six commands that turn Claude into a senior product designer reviewing your codebase: scan for hardcoded tokens, orphan variants, WCAG AA gaps and naming drift. Document the components that work. Reason the ones that are missing. Export tokens as W3C DTCG, the whole DS as a [`DESIGN.md`](https://github.com/google-labs-code/design.md), and diff two versions to catch breaking changes before they ship.
 
 Stack-aware for **React · Next · Vue · Svelte · Tailwind v3/v4 · shadcn · Radix · cva**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-ff6b35.svg)](https://docs.claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-0.3.2-blue.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](./CHANGELOG.md)
 
 ---
 
@@ -20,6 +20,8 @@ Stack-aware for **React · Next · Vue · Svelte · Tailwind v3/v4 · shadcn · 
 | Document a component          | 30 min   | **1–2 min** |
 | Reason a new pattern          | 1 hour   | **2–3 min** |
 | Extract tokens from code      | 4 hours  | **3–5 min** |
+| Compare two DS versions       | manual side-by-side | **< 1 min** |
+| Share lint rules with team    | hand-rolled doc | **instant** |
 
 No config. No dependencies beyond Claude Code itself. Opinionated output grounded in Nielsen, W3C DTCG, and 8+ years of real DS production.
 
@@ -45,14 +47,16 @@ That's it. The installer sets up both the skill and the `/ds` shortcut.
 
 Every designer I know has a Notion page called « DS audit » they never open. Every engineering team has a `components/ui/` folder that drifts three times a year. **The problem isn't the will — it's the time to look at it seriously.**
 
-This skill does the looking. The four commands:
+This skill does the looking. The six commands:
 
-- **`/ds audit`** detects your stack (Next/Tailwind/shadcn/Radix/cva) and applies relevant checks: hardcoded tokens, orphan components, WCAG AA gaps, naming drift, god-mode components, unused cva variants. Scores it /100 with a 3-band priority list.
+- **`/ds audit`** detects your stack (Next/Tailwind/shadcn/Radix/cva) and applies 12 named lint rules: hardcoded tokens, orphan components, WCAG AA gaps, naming drift, god-mode components, unused cva variants. Scores it /100 with a 3-band priority list **and** generates a `DESIGN.md` (compatible with [`@google/design.md`](https://github.com/google-labs-code/design.md)) — the single artefact any downstream agent (Cursor, Copilot…) needs to respect your DS.
 - **`/ds document <component>`** extracts API, variants, states, a11y from the file and produces markdown doc ready for Storybook, Notion, or your team Slack.
 - **`/ds extend <pattern>`** proposes a new component **before** you write it: 2–3 options with tradeoffs, API contract, tokens consumed, a11y considerations.
 - **`/ds tokens`** scans your code + CSS and extracts every color, spacing, radius, typography value actually used — outputs a valid W3C DTCG `tokens.json` you can import into Figma Tokens Studio, Style Dictionary or Terrazzo.
+- **`/ds diff <before> <after>`** *(new in v0.4)* compares two `DESIGN.md` files (or two audit JSON reports), surfaces breaking changes, lists consumer files, gives a verdict in one line: ✅ Compatible / ⚠️ Visual change / 🔴 Breaking. The "did my PR break the DS?" answer.
+- **`/ds rules`** *(new in v0.4)* exports the 12 lint rules as markdown or JSON — drop them in another agent's prompt (Cursor, Copilot, Codex), commit as `DS-RULES.md`, or hand them to your team as a contract.
 
-French prose, English for technical terms (token, variant, WCAG, ARIA — the industry words). Every flagged issue comes with its rule reference and a proposed fix, not just a complaint.
+French prose, English for technical terms (token, variant, WCAG, ARIA — the industry words). Every flagged issue comes with its rule name (`hardcoded-color`, `a11y-contrast`…), a fixed default severity, and a proposed fix — not just a complaint.
 
 ---
 
@@ -134,19 +138,24 @@ cp slash/ds.md ~/.claude/commands/ds.md
 design-system-pro/
 ├── SKILL.md                      # entry point read by Claude Code
 ├── commands/                     # internal procedures (referenced by SKILL.md)
-│   ├── audit.md
+│   ├── audit.md                  # ← enriched in v0.4 (named rules, DESIGN.md output)
 │   ├── document.md
 │   ├── extend.md
-│   └── tokens.md                 # ← new in v0.2
+│   ├── tokens.md                 # ← new in v0.2
+│   ├── diff.md                   # ← new in v0.4
+│   ├── rules.md                  # ← new in v0.4
+│   └── help.md                   # ← new in v0.3
 ├── references/
 │   ├── tokens-schema.md
 │   ├── component-anatomy.md
 │   ├── a11y-checklist.md
 │   └── stack-detection.md        # ← new in v0.2
 ├── templates/
-│   ├── audit-report.md
+│   ├── audit-report.md           # ← refactored in v0.4 (canonical sections, JSON findings)
 │   ├── component-doc.md
-│   └── tokens.json
+│   ├── tokens.json
+│   └── design.md                 # ← new in v0.4 — DESIGN.md format (compatible @google/design.md)
+├── docs/                         # ← new in v0.3 — step-by-step tutorials
 ├── slash/
 │   └── ds.md                     # ← new in v0.2 — Claude Code slash command
 └── setup.sh                      # ← new in v0.2 — one-line installer
@@ -309,6 +318,37 @@ composant. Radix AlertDialog existe déjà — bon base.
 
 </details>
 
+### `/ds diff <before> <after>` *(new in v0.4)*
+
+Compares two `DESIGN.md` files (or two audit JSON reports) and surfaces:
+
+- Tokens added / removed / modified (per section: colors, typography, spacing, rounded, components)
+- Breaking changes flagged in red, with the list of consumer files (`grep`-derived)
+- Findings resolved / new / persistent between two audits
+- A one-line verdict: ✅ Compatible / ⚠️ Visual change / 🔴 Breaking
+- Machine-readable JSON block aligned with [`@google/design.md diff`](https://github.com/google-labs-code/design.md) — interoperable
+
+Drop it in your CI: fail the build when a PR introduces a 🔴 Breaking change.
+
+### `/ds rules` *(new in v0.4)*
+
+Exports the 12 named lint rules used by `/ds audit` as either markdown (default) or JSON:
+
+```bash
+/ds rules                        # full markdown spec
+/ds rules --format json
+/ds rules --severity error       # filter by severity
+/ds rules --rule a11y-contrast   # detail of one rule
+```
+
+Use cases:
+
+- Paste into another agent's system prompt (Cursor, Copilot Chat, Codex) so it applies the same rules
+- Commit as `DS-RULES.md` or `.cursor/rules/ds.md` — your team gets the same contract
+- Hand it to your CI to enforce a deterministic check
+
+The 12 rules: `a11y-contrast`, `a11y-label-missing`, `a11y-focus-removed`, `a11y-semantic`, `hardcoded-color`, `hardcoded-spacing`, `hardcoded-typography`, `orphan-variant`, `god-component`, `duplicated-component`, `naming-drift`, `orphan-export`. Each has a fixed default severity — overrides require an explicit `reason`, so judgment becomes auditable instead of implicit.
+
 ### `/ds tokens` *(new in v0.2)*
 
 Scans your code + CSS and extracts used tokens:
@@ -377,7 +417,15 @@ Six principles the skill applies to every output:
 
 ## Roadmap
 
-**v0.3.0** ← you are here
+**v0.4.0** ← you are here
+- [x] `DESIGN.md` as a first-class output of `/ds audit` — single source of truth lisible par tout agent
+- [x] 12 named lint rules with fixed default severity (`a11y-contrast`, `hardcoded-color`…)
+- [x] Structured findings JSON block in every audit report — diff-able, exportable to a tracker
+- [x] New `/ds diff` command — détecte breaking changes entre deux versions du DS
+- [x] New `/ds rules` command — exporte la spec en markdown ou JSON, injectable dans un autre agent
+- [x] Canonical section order (`Overview → Colors → … → Do's and Don'ts`) — reports comparable across projects
+
+**v0.3.0**
 - [x] New `/ds help` command — formatted menu with examples
 - [x] `docs/` folder — 4 step-by-step tutorials
 - [x] Enriched install message — first-step guidance after setup.sh
@@ -397,7 +445,7 @@ Six principles the skill applies to every output:
 **v1.0 (free)**
 - [ ] Broader framework support (Solid, Qwik, Astro)
 - [ ] Storybook-aware documentation (read `.stories.tsx` to enrich doc)
-- [ ] JSON output for CI integration
+- [ ] CI-ready JSON output (already in v0.4 for audit/diff — extend to all commands)
 - [ ] English version of the SKILL.md
 
 **v2.0 (paid)**

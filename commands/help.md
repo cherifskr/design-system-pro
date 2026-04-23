@@ -21,7 +21,7 @@ Nom, pitch, version. Exemple :
 > product designer. Version 0.3.0 — par Chérif Sikirou.
 ```
 
-### Section 2 — Les 4 commandes, avec exemples
+### Section 2 — Les 6 commandes, avec exemples
 
 Pour chaque commande, produis un bloc :
 
@@ -51,7 +51,43 @@ refactor, quand tu arrives sur un projet legacy.
 **Tutorial** : voir ~/.claude/skills/design-system-pro/docs/first-audit.md
 ```
 
-Fais-le pour `audit`, `document`, `extend`, `tokens`.
+Fais-le pour `audit`, `document`, `extend`, `tokens`, `diff`, `rules`.
+
+Pour `diff` et `rules` *(nouveau v0.4)* :
+
+```markdown
+## 🔀 `/ds diff` — compare deux états du DS
+
+**Ce que ça fait** : compare deux `DESIGN.md` (ou deux rapports d'audit
+JSON) et détecte tokens ajoutés/supprimés/modifiés, breaking changes,
+régressions de findings.
+
+**Quand l'utiliser** : avant de merger une PR qui touche le DS, après
+une refonte, pour valider qu'une migration ne casse rien.
+
+**Exemple** :
+    /ds diff DESIGN.md DESIGN-v2.md
+    /ds diff audit-before.json audit-after.json
+
+**Durée** : < 1 min
+
+## 📜 `/ds rules` — exporte la spec des règles
+
+**Ce que ça fait** : sort la liste des règles de lint utilisées par
+`/ds audit` (markdown ou JSON), injectable dans le prompt système d'un
+autre agent (Cursor, Copilot) ou commitable au repo comme contrat
+partagé.
+
+**Quand l'utiliser** : pour partager les règles avec ton équipe, pour
+configurer un autre agent, pour générer un fichier `DS-RULES.md`.
+
+**Exemple** :
+    /ds rules
+    /ds rules --format json
+    /ds rules --severity error
+
+**Durée** : instantané
+```
 
 ### Section 3 — Comment invoquer sans `/ds`
 

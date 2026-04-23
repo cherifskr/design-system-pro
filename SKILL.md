@@ -7,7 +7,7 @@ description: Audite, documente, étend et exporte un design system comme un seni
 
 Ce skill transforme Claude en **partenaire senior sur ton design system**. Il scanne ton code (React, Next, Vue, Svelte, Tailwind v3/v4, shadcn, CSS-in-JS), repère les incohérences qu'un humain mettrait une journée à trouver, et produit des livrables partageables avec ton équipe.
 
-Cinq commandes, un seul principe : **consistance > créativité**.
+Sept commandes, un seul principe : **consistance > créativité**.
 
 ## Comment l'invoquer
 
@@ -34,15 +34,17 @@ Claude détecte le skill automatiquement sur les mots-clés de cette description
 
 **Première fois ?** Lance `/ds help` pour voir le menu complet avec exemples, ou lis directement les tutoriels dans [docs/](docs/).
 
-## Les 5 commandes
+## Les 7 commandes
 
 ### `/ds help` — menu d'aide formaté *(nouveau v0.3)*
 Premier geste quand tu découvres le skill. Affiche le menu complet avec les 4 autres commandes, leurs exemples, la durée moyenne de chaque, et des liens vers les tutoriels étape-par-étape dans `docs/`.
 
 → Voir [commands/help.md](commands/help.md)
 
-### `/ds audit` — diagnostic complet, stack-aware
-Détecte ta stack (framework + UI libs + tokens) puis applique les checks pertinents :
+### `/ds audit` — diagnostic complet, stack-aware *(enrichi v0.4)*
+Détecte ta stack (framework + UI libs + tokens) puis applique 9 règles
+nommées avec sévérité fixe (`a11y-contrast`, `hardcoded-color`,
+`orphan-variant`, `god-component`…) :
 - Tokens hardcodés (hex, rgb, px non-rationalisés)
 - Variants cva orphelins (définis mais jamais consommés)
 - Écarts WCAG AA (contraste calculé, pas juste flaggé)
@@ -50,7 +52,12 @@ Détecte ta stack (framework + UI libs + tokens) puis applique les checks pertin
 - Composants orphelins (exportés mais jamais importés)
 - God-mode components (15+ props = signal de découpage)
 - Duplication fonctionnelle (Card vs Tile vs Panel)
-- Score /100 + plan priorisé en 3 bandes (🔴 bloquant / 🟡 dette / 🟢 polish)
+- Score /100 + plan priorisé en 3 bandes (🔴 error / 🟡 warning / 🟢 info)
+
+**Nouveau v0.4** : produit en plus un **`DESIGN.md`** à la racine du
+scope — la carte d'identité du DS, lisible par tout agent, format
+compatible [`@google/design.md`](https://github.com/google-labs-code/design.md).
+Et un **bloc JSON de findings** machine-readable en fin de rapport.
 
 → Voir [commands/audit.md](commands/audit.md)
 
@@ -76,6 +83,31 @@ Tu as un besoin ? Le skill propose un nouveau composant **avant** que tu l'écri
 
 → Voir [commands/extend.md](commands/extend.md)
 
+### `/ds diff [before] [after]` — compare deux états du DS *(nouveau v0.4)*
+Diffe deux `DESIGN.md` ou deux rapports d'audit JSON :
+- Tokens ajoutés / supprimés / modifiés (par section)
+- Breaking changes flaggés en rouge avec liste des fichiers consommateurs
+- Findings résolus / nouveaux / persistants entre deux audits
+- Verdict en 1 ligne : ✅ Compatible · ⚠️ Visual change · 🔴 Breaking
+- Bloc JSON machine-readable, format aligné sur `@google/design.md diff`
+
+→ Voir [commands/diff.md](commands/diff.md)
+
+### `/ds rules` — exporte la spec des règles *(nouveau v0.4)*
+Sort les 12 règles de lint utilisées par `/ds audit` au format markdown
+ou JSON. Injectable dans le prompt système d'un autre agent (Cursor,
+Copilot, Codex…) ou commitable au repo (`DS-RULES.md`,
+`.cursor/rules/ds.md`) comme contrat partagé.
+
+```bash
+/ds rules                        # markdown complet
+/ds rules --format json
+/ds rules --severity error
+/ds rules --rule a11y-contrast
+```
+
+→ Voir [commands/rules.md](commands/rules.md)
+
 ### `/ds tokens` — extraction vers W3C DTCG *(nouveau v0.2)*
 Scanne ton code + CSS et **extrait** tous les tokens effectivement utilisés :
 - Couleurs, spacings, radii, font sizes, shadows, durées d'animation
@@ -99,6 +131,7 @@ Le skill s'appuie sur 4 documents de référence — charge-les quand tu en as b
 - [templates/audit-report.md](templates/audit-report.md) — structure du rapport d'audit
 - [templates/component-doc.md](templates/component-doc.md) — format de doc composant
 - [templates/tokens.json](templates/tokens.json) — exemple tokens W3C valides
+- [templates/design.md](templates/design.md) *(v0.4)* — carte d'identité du DS, format compatible [`@google/design.md`](https://github.com/google-labs-code/design.md)
 
 ## Tutoriels pas-à-pas *(nouveau v0.3)*
 
